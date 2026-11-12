@@ -1,0 +1,2349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PetCare Pro — Client Presentation Blueprint & Live Platform Prototype</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              teal: '#0F4C5C',
+              tealDark: '#09323D',
+              tealLight: '#E6F2F5',
+              amber: '#E36414',
+              amberSoft: '#FFF3EB',
+              sand: '#F4A261',
+              cream: '#FAF9F6',
+              ink: '#1E293B',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #FAF9F6;
+      color: #1E293B;
+      font-family: 'Inter', sans-serif;
+    }
+    h1, h2, h3, h4, .font-display {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    /* Smooth subtle transitions */
+    .tab-panel {
+      animation: fadeIn 0.28s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #F1F5F9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94A3B8;
+    }
+    /* Flow connector lines */
+    .flow-arrow::after {
+      content: '→';
+      font-weight: 800;
+      color: #0F4C5C;
+    }
+    @media (max-width: 768px) {
+      .flow-arrow::after {
+        content: '↓';
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-brand-teal selection:text-white">
+
+  <!-- =====================================================================
+       PRESENTER MASTER CONTROL BAR (Top Pitch Navigation)
+  ====================================================================== -->
+  <header class="sticky top-0 z-50 bg-brand-tealDark text-white shadow-lg border-b border-white/10">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3">
+      <!-- Brand / Presentation Title -->
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-brand-amber flex items-center justify-center shadow-inner shrink-0">
+          <i data-lucide="paw-print" class="w-5 h-5 text-white"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-display font-bold text-sm sm:text-base tracking-tight">PetCare Pro</span>
+            <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-brand-amber/20 text-brand-sand border border-brand-sand/30">
+              Client Walkthrough
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-300 leading-tight">Interactive Architecture & Live Store Prototype</p>
+        </div>
+      </div>
+
+      <!-- Mode Switcher Pills -->
+      <nav aria-label="Presentation Views" class="flex items-center bg-black/30 p-1 rounded-xl border border-white/10 w-full sm:w-auto justify-between sm:justify-start">
+        <button onclick="switchMasterView('blueprint')" id="nav-blueprint"
+          class="master-tab flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-white text-brand-tealDark shadow">
+          <i data-lucide="workflow" class="w-4 h-4"></i>
+          <span>1. Visual Blueprint</span>
+        </button>
+        <button onclick="switchMasterView('storefront')" id="nav-storefront"
+          class="master-tab flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all text-slate-200 hover:text-white">
+          <i data-lucide="store" class="w-4 h-4"></i>
+          <span>2. Customer Store</span>
+        </button>
+        <button onclick="switchMasterView('admin')" id="nav-admin"
+          class="master-tab flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all text-slate-200 hover:text-white">
+          <i data-lucide="shield-check" class="w-4 h-4"></i>
+          <span>3. Admin Panel</span>
+        </button>
+      </nav>
+
+      <!-- Live Sync Status & Pitch Tips Toggle -->
+      <div class="hidden lg:flex items-center gap-3">
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/10 border border-white/10 text-xs">
+          <span class="text-slate-300">Shop Status:</span>
+          <button onclick="toggleShopStatus()" id="header-shop-pill"
+            class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full font-bold text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 hover:bg-emerald-500/30 transition">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span id="header-shop-text">OPEN NOW</span>
+          </button>
+        </div>
+        <button onclick="togglePitchTips()" id="pitch-tips-btn"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-brand-amber hover:bg-orange-600 text-white text-xs font-semibold transition shadow">
+          <i data-lucide="lightbulb" class="w-3.5 h-3.5"></i>
+          <span>Pitch Notes: ON</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Presenter Guidance Banner (Toggleable) -->
+  <div id="pitch-banner" class="bg-amber-50 border-b border-amber-200/80 px-4 py-2.5 text-xs sm:text-sm text-amber-950">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <span class="px-2 py-0.5 rounded-md bg-amber-200/80 text-amber-900 font-bold text-[11px] uppercase shrink-0">Presenter Guide</span>
+        <p id="pitch-guide-text">
+          Start here to show the shopkeeper the big picture: how customers buy food & medicines, book clinic visits, how closed-shop orders auto-shift delivery, and how Super Admin controls everything.
+        </p>
+      </div>
+      <button onclick="togglePitchTips()" class="text-amber-700 hover:text-amber-950 font-semibold text-xs shrink-0 underline">Hide</button>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       TOAST NOTIFICATION CONTAINER (Replaces alert() cleanly)
+  ====================================================================== -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-[100] flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
+
+  <!-- =====================================================================
+       VIEW 1: SYSTEM ARCHITECTURE & WORKFLOW BLUEPRINT
+  ====================================================================== -->
+  <main id="view-blueprint" class="tab-panel flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-8 space-y-8">
+    <!-- Blueprint Header -->
+    <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200/80 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+      <div class="space-y-2 max-w-2xl">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-tealLight text-brand-teal text-xs font-bold">
+          <i data-lucide="layers" class="w-3.5 h-3.5"></i>
+          End-to-End Platform Blueprint
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+          How Your Pet Shop Digital Platform Works
+        </h1>
+        <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
+          A complete, scalable commerce & clinic management system designed for selling <strong>Pet Food, Veterinary Medicines, Accessories</strong>, and <strong>In-Store Services</strong>—with full shopkeeper control and future-ready expansion modules.
+        </p>
+      </div>
+      <div class="flex flex-wrap gap-3 shrink-0">
+        <button onclick="switchMasterView('storefront')"
+          class="px-5 py-3 rounded-2xl bg-brand-teal hover:bg-brand-tealDark text-white font-semibold text-sm flex items-center gap-2 shadow-md transition">
+          <i data-lucide="play-circle" class="w-4 h-4"></i>
+          Try Live Customer Demo
+        </button>
+        <button onclick="switchMasterView('admin')"
+          class="px-5 py-3 rounded-2xl bg-brand-amberSoft hover:bg-orange-100 text-brand-amber border border-brand-amber/30 font-semibold text-sm flex items-center gap-2 transition">
+          <i data-lucide="sliders" class="w-4 h-4"></i>
+          Try Shopkeeper Admin
+        </button>
+      </div>
+    </div>
+
+    <!-- Interactive Workflow Selector Tabs -->
+    <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200/80 space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+        <div>
+          <h2 class="text-lg sm:text-xl font-bold text-slate-900">Interactive Workflow Diagrams</h2>
+          <p class="text-xs sm:text-sm text-slate-500">Click any workflow step below to inspect business rules and automation</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button onclick="selectFlowDiagram('customer')" id="flow-btn-customer"
+            class="flow-selector px-3.5 py-2 rounded-xl text-xs font-bold bg-brand-teal text-white transition">
+            1. Shopping & Delivery Logic
+          </button>
+          <button onclick="selectFlowDiagram('booking')" id="flow-btn-booking"
+            class="flow-selector px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+            2. Visit & Service Booking
+          </button>
+          <button onclick="selectFlowDiagram('admin')" id="flow-btn-admin"
+            class="flow-selector px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+            3. Admin & Role Hierarchy
+          </button>
+          <button onclick="selectFlowDiagram('monetization')" id="flow-btn-monetization"
+            class="flow-selector px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+            4. Ads & Future Scalability
+          </button>
+        </div>
+      </div>
+
+      <!-- Flow Diagram Canvas -->
+      <div id="flow-diagram-content" class="space-y-6">
+        <!-- Populated dynamically via JS for interactive step inspection -->
+      </div>
+    </div>
+
+    <!-- Interactive "Shop Open vs Closed" Delivery Simulator Card -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div class="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-7 shadow-sm border border-slate-200/80 space-y-5">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-brand-amber">Smart Business Logic</span>
+            <h3 class="text-xl font-bold text-slate-900 mt-1">Shop Open/Closed & Auto-Delivery Calculator</h3>
+            <p class="text-sm text-slate-600 mt-1">
+              Test how the system automatically adjusts promised delivery dates when your shop is closed or after working hours.
+            </p>
+          </div>
+          <button onclick="toggleShopStatus()"
+            class="px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold flex items-center gap-2 shrink-0 transition shadow">
+            <i data-lucide="power" class="w-4 h-4 text-brand-sand"></i>
+            Toggle Shop Status
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+          <div class="p-4 rounded-2xl border-2 transition-all" id="sim-card-open">
+            <div class="flex items-center justify-between mb-2">
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">Scenario A: Shop OPEN</span>
+              <i data-lucide="sun" class="w-5 h-5 text-emerald-600"></i>
+            </div>
+            <p class="text-xs text-slate-600 mb-3">Orders placed during working hours (9:00 AM – 9:00 PM) enter immediate dispatch queue.</p>
+            <div class="bg-slate-50 p-3 rounded-xl text-xs space-y-1">
+              <div class="flex justify-between"><span class="text-slate-500">Processing:</span><span class="font-semibold text-slate-800">Same Day Dispatch</span></div>
+              <div class="flex justify-between"><span class="text-slate-500">Est. Delivery:</span><span class="font-bold text-emerald-700">1 – 2 Days (Standard)</span></div>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-2xl border-2 transition-all" id="sim-card-closed">
+            <div class="flex items-center justify-between mb-2">
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-800">Scenario B: Shop CLOSED</span>
+              <i data-lucide="moon" class="w-5 h-5 text-rose-600"></i>
+            </div>
+            <p class="text-xs text-slate-600 mb-3">Customer can still browse & pay online! System automatically adds +1 working day buffer.</p>
+            <div class="bg-slate-50 p-3 rounded-xl text-xs space-y-1">
+              <div class="flex justify-between"><span class="text-slate-500">Processing:</span><span class="font-semibold text-rose-700">Next Working Day Morning</span></div>
+              <div class="flex justify-between"><span class="text-slate-500">Est. Delivery:</span><span class="font-bold text-brand-amber">Shifted +1 Working Day</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modular Extensibility Architecture Card -->
+      <div class="lg:col-span-5 bg-gradient-to-br from-brand-tealDark to-brand-teal text-white rounded-3xl p-6 sm:p-7 shadow-md flex flex-col justify-between space-y-5">
+        <div class="space-y-2">
+          <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/15 text-brand-sand text-xs font-bold">
+            <i data-lucide="puzzle" class="w-3.5 h-3.5"></i>
+            Open & Modular Architecture
+          </div>
+          <h3 class="text-xl font-bold">Built to Grow With Your Business</h3>
+          <p class="text-xs sm:text-sm text-slate-200 leading-relaxed">
+            Your platform is engineered with clean, modular APIs so new revenue streams can be plugged in anytime without rebuilding the website:
+          </p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5 text-xs">
+          <div class="p-3 rounded-2xl bg-white/10 border border-white/10">
+            <div class="font-bold text-brand-sand flex items-center gap-1.5"><i data-lucide="megaphone" class="w-3.5 h-3.5"></i> Ad Network</div>
+            <p class="text-slate-200 mt-1 text-[11px]">Sponsored pet food banners for extra income.</p>
+          </div>
+          <div class="p-3 rounded-2xl bg-white/10 border border-white/10">
+            <div class="font-bold text-brand-sand flex items-center gap-1.5"><i data-lucide="repeat" class="w-3.5 h-3.5"></i> Auto-Refill</div>
+            <p class="text-slate-200 mt-1 text-[11px]">Monthly pet food & medicine subscriptions.</p>
+          </div>
+          <div class="p-3 rounded-2xl bg-white/10 border border-white/10">
+            <div class="font-bold text-brand-sand flex items-center gap-1.5"><i data-lucide="award" class="w-3.5 h-3.5"></i> PawPoints</div>
+            <p class="text-slate-200 mt-1 text-[11px]">Customer loyalty wallet & referral rewards.</p>
+          </div>
+          <div class="p-3 rounded-2xl bg-white/10 border border-white/10">
+            <div class="font-bold text-brand-sand flex items-center gap-1.5"><i data-lucide="smartphone" class="w-3.5 h-3.5"></i> Mobile Apps</div>
+            <p class="text-slate-200 mt-1 text-[11px]">Ready for Android/iOS & delivery rider app.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- =====================================================================
+       VIEW 2: INTERACTIVE CUSTOMER STOREFRONT PROTOTYPE
+  ====================================================================== -->
+  <main id="view-storefront" class="tab-panel hidden flex-1">
+    <!-- Live Shop Status Announcement Bar -->
+    <div id="store-status-bar" class="bg-emerald-600 text-white px-4 py-2 text-xs sm:text-sm font-medium transition-colors">
+      <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <span id="store-status-dot" class="w-2.5 h-2.5 rounded-full bg-white animate-pulse"></span>
+          <span id="store-status-message">
+            <strong>Shop is OPEN!</strong> Order now for same-day dispatch & rapid local delivery.
+          </span>
+        </div>
+        <div class="flex items-center gap-3 text-xs">
+          <span class="opacity-90 hidden sm:inline" id="store-hours-display">Hours: 9:00 AM – 9:00 PM</span>
+          <button onclick="toggleShopStatus()" class="px-2.5 py-0.5 rounded-lg bg-black/20 hover:bg-black/30 font-semibold transition">
+            Simulate Open/Close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Storefront Navigation Header -->
+    <div class="bg-white border-b border-slate-200 sticky top-[52px] z-40 shadow-sm">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-4">
+        <!-- Store Logo -->
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-2xl bg-brand-teal text-white flex items-center justify-center shadow-sm">
+            <i data-lucide="heart-handshake" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <span class="font-display font-extrabold text-lg text-brand-tealDark tracking-tight block leading-none">Paws & Wellness</span>
+            <span class="text-[11px] text-slate-500 font-medium">Pet Nutrition • Pharmacy • Care Clinic</span>
+          </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="order-3 md:order-2 w-full md:w-96 lg:w-[440px] relative">
+          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+          <input type="text" id="store-search-input" oninput="filterProducts()"
+            placeholder="Search dog food, tick medicine, dewormer, grooming..."
+            class="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-slate-100 border border-transparent focus:bg-white focus:border-brand-teal focus:outline-none text-sm transition" />
+        </div>
+
+        <!-- Action Buttons: Book Visit & Cart -->
+        <div class="order-2 md:order-3 flex items-center gap-2.5">
+          <button onclick="openBookingModal()"
+            class="px-3.5 py-2.5 rounded-2xl bg-brand-amberSoft hover:bg-orange-100 text-brand-amber font-bold text-xs sm:text-sm flex items-center gap-1.5 border border-brand-amber/20 transition">
+            <i data-lucide="calendar-heart" class="w-4 h-4"></i>
+            <span>Book Visit / Vet</span>
+          </button>
+
+          <button onclick="openCartDrawer()"
+            class="relative px-4 py-2.5 rounded-2xl bg-brand-teal hover:bg-brand-tealDark text-white font-bold text-xs sm:text-sm flex items-center gap-2 shadow-sm transition">
+            <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+            <span class="hidden sm:inline">Cart</span>
+            <span id="cart-badge-count" class="px-2 py-0.5 rounded-full bg-brand-amber text-white text-xs font-extrabold">0</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-8">
+      <!-- Hero & Vision Section -->
+      <section class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-brand-tealDark via-brand-teal to-[#16697A] text-white p-6 sm:p-10 shadow-md">
+        <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <div class="lg:col-span-7 space-y-4">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 text-brand-sand text-xs font-bold backdrop-blur-sm">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+              Our Vision: Healthy Pets, Happy Families
+            </div>
+            <h1 class="text-2xl sm:text-4xl font-extrabold leading-tight">
+              Wholesome Nutrition, Trusted Veterinary Medicine & Loving Care Under One Roof.
+            </h1>
+            <p class="text-slate-100 text-sm sm:text-base max-w-2xl leading-relaxed">
+              We believe every pet deserves authentic medicines, vet-approved nutrition, and stress-free care. Order online with transparent delivery estimates or book an in-store wellness visit.
+            </p>
+            <div class="flex flex-wrap gap-3 pt-2">
+              <a href="#catalog-section" class="px-5 py-3 rounded-2xl bg-brand-amber hover:bg-orange-600 text-white font-bold text-sm shadow-lg transition flex items-center gap-2">
+                <i data-lucide="shopping-cart" class="w-4 h-4"></i>
+                Shop Food & Medicines
+              </a>
+              <button onclick="openBookingModal()" class="px-5 py-3 rounded-2xl bg-white/15 hover:bg-white/25 text-white font-semibold text-sm backdrop-blur-sm transition flex items-center gap-2">
+                <i data-lucide="stethoscope" class="w-4 h-4"></i>
+                Book Clinic / Grooming Visit
+              </button>
+            </div>
+          </div>
+
+          <!-- Services Quick Highlight Cards -->
+          <div class="lg:col-span-5 grid grid-cols-2 gap-3">
+            <div class="p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 space-y-1.5">
+              <div class="w-9 h-9 rounded-xl bg-brand-amber/30 flex items-center justify-center text-brand-sand">
+                <i data-lucide="bone" class="w-5 h-5"></i>
+              </div>
+              <h3 class="font-bold text-sm">Premium Pet Food</h3>
+              <p class="text-xs text-slate-200">Breed-specific dry, wet & prescription diets.</p>
+            </div>
+            <div class="p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 space-y-1.5">
+              <div class="w-9 h-9 rounded-xl bg-emerald-400/20 flex items-center justify-center text-emerald-300">
+                <i data-lucide="pill" class="w-5 h-5"></i>
+              </div>
+              <h3 class="font-bold text-sm">Pet Pharmacy</h3>
+              <p class="text-xs text-slate-200">100% genuine dewormers, tick care & supplements.</p>
+            </div>
+            <div class="p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 space-y-1.5">
+              <div class="w-9 h-9 rounded-xl bg-sky-400/20 flex items-center justify-center text-sky-300">
+                <i data-lucide="scissors" class="w-5 h-5"></i>
+              </div>
+              <h3 class="font-bold text-sm">Spa & Grooming</h3>
+              <p class="text-xs text-slate-200">Hygienic baths, nail clipping & coat styling.</p>
+            </div>
+            <div class="p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 space-y-1.5">
+              <div class="w-9 h-9 rounded-xl bg-purple-400/20 flex items-center justify-center text-purple-300">
+                <i data-lucide="truck" class="w-5 h-5"></i>
+              </div>
+              <h3 class="font-bold text-sm">Doorstep Delivery</h3>
+              <p class="text-xs text-slate-200">Managed by our team with exact day tracking.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sponsored Ad Monetization Banner (Controlled from Admin Panel!) -->
+      <section id="store-ad-banner" class="rounded-2xl bg-gradient-to-r from-amber-100 via-orange-50 to-amber-100 border border-amber-300/80 p-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-2xl bg-brand-amber text-white flex items-center justify-center shrink-0 font-display font-extrabold text-lg shadow">
+            AD
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-amber-200 text-amber-900">Sponsored Partner Slot</span>
+              <span class="text-xs text-amber-800 font-medium">Extra Revenue Stream for Shopkeeper</span>
+            </div>
+            <h3 id="ad-banner-title" class="font-bold text-slate-900 text-sm sm:text-base mt-0.5">
+              Royal Paw Nutrition — Get 15% Extra Protein Formula for Active Dogs!
+            </h3>
+            <p id="ad-banner-subtitle" class="text-xs text-slate-600">
+              Partner brands pay you monthly to display featured promotions right here. Toggleable in Admin Panel.
+            </p>
+          </div>
+        </div>
+        <button onclick="filterByCategory('Pet Food')" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shrink-0 transition">
+          Explore Partner Deal
+        </button>
+      </section>
+
+      <!-- Catalog Controls: Categories + Delivery Pincode Estimator -->
+      <section id="catalog-section" class="space-y-5">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <!-- Category Filter Pills -->
+          <div class="flex items-center gap-2 overflow-x-auto pb-1" id="category-pills-container">
+            <!-- Populated dynamically -->
+          </div>
+
+          <!-- Instant Delivery Estimator Widget -->
+          <div class="flex items-center gap-2 bg-white px-3.5 py-2 rounded-2xl border border-slate-200 shadow-sm shrink-0">
+            <i data-lucide="map-pin" class="w-4 h-4 text-brand-amber shrink-0"></i>
+            <span class="text-xs text-slate-500 font-medium">Deliver to:</span>
+            <input type="text" id="pincode-input" value="600001" maxlength="6" onchange="updateDeliveryEstimateDisplay()"
+              class="w-20 text-xs font-bold text-slate-800 bg-slate-100 px-2 py-1 rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-teal" />
+            <span id="global-delivery-badge" class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg">
+              Est. 1–2 Days
+            </span>
+          </div>
+        </div>
+
+        <!-- Product Grid -->
+        <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          <!-- Product cards injected via JS -->
+        </div>
+      </section>
+
+      <!-- Dedicated Service & Visit Booking Banner -->
+      <section class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+        <div class="lg:col-span-8 space-y-2">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-tealLight text-brand-teal text-xs font-bold">
+            <i data-lucide="calendar-check" class="w-3.5 h-3.5"></i>
+            In-Store Services & Vet Appointments
+          </span>
+          <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900">
+            Need a Vet Checkup, Vaccination, or Full Grooming Session?
+          </h2>
+          <p class="text-sm text-slate-600">
+            Skip waiting lines at the shop. Customers can pick their pet type, select a service, choose a convenient date & time slot, and receive instant appointment confirmation.
+          </p>
+        </div>
+        <div class="lg:col-span-4 flex lg:justify-end">
+          <button onclick="openBookingModal()"
+            class="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-brand-teal hover:bg-brand-tealDark text-white font-bold text-sm shadow-md flex items-center justify-center gap-2 transition">
+            <i data-lucide="calendar-plus" class="w-4 h-4"></i>
+            Book Shop Visit / Service
+          </button>
+        </div>
+      </section>
+
+      <!-- Store Footer with Policy Links (Return, Refund, Security) -->
+      <footer class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 text-sm text-slate-600 space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="space-y-2">
+            <div class="font-display font-bold text-brand-tealDark text-base flex items-center gap-2">
+              <i data-lucide="paw-print" class="w-4 h-4 text-brand-amber"></i>
+              Paws & Wellness Pet Shop
+            </div>
+            <p class="text-xs text-slate-500 leading-relaxed">
+              Your neighborhood pet supermarket, licensed veterinary pharmacy, and grooming lounge. Dedicated in-house delivery team for safe handling of medicines and food.
+            </p>
+          </div>
+          <div class="space-y-2">
+            <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Customer Policies (Click to View)</h4>
+            <div class="flex flex-wrap gap-2">
+              <button onclick="openPolicyModal('return')" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-brand-tealLight hover:text-brand-teal text-xs font-semibold transition">
+                Return Policy
+              </button>
+              <button onclick="openPolicyModal('refund')" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-brand-tealLight hover:text-brand-teal text-xs font-semibold transition">
+                Refund Policy
+              </button>
+              <button onclick="openPolicyModal('security')" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-brand-tealLight hover:text-brand-teal text-xs font-semibold transition">
+                Security & Privacy Policy
+              </button>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Trusted Online Payments</h4>
+            <div class="flex flex-wrap gap-2 text-xs font-semibold text-slate-700">
+              <span class="px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200">UPI / QR</span>
+              <span class="px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200">Credit / Debit Cards</span>
+              <span class="px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200">NetBanking</span>
+              <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200">256-bit SSL</span>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </main>
+
+  <!-- =====================================================================
+       VIEW 3: INTERACTIVE SHOPKEEPER & SUPER ADMIN PANEL PROTOTYPE
+  ====================================================================== -->
+  <main id="view-admin" class="tab-panel hidden flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 space-y-6">
+    <!-- Admin Top Header & Role Switcher -->
+    <div class="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div class="flex items-center gap-3.5">
+        <div class="w-12 h-12 rounded-2xl bg-brand-tealDark text-white flex items-center justify-center shrink-0">
+          <i data-lucide="layout-dashboard" class="w-6 h-6 text-brand-sand"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900">Shopkeeper Control Center</h1>
+            <span id="admin-role-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-purple-100 text-purple-800">
+              SUPER ADMIN
+            </span>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-500">
+            Manage catalog, offers, per-product return rules, orders, delivery status, shop timings & staff admins.
+          </p>
+        </div>
+      </div>
+
+      <!-- Role Simulator & Shop Master Switch -->
+      <div class="flex flex-wrap items-center gap-3">
+        <!-- Switch Role Demo -->
+        <div class="flex items-center bg-slate-100 p-1 rounded-2xl border border-slate-200">
+          <button onclick="setAdminRole('super')" id="role-btn-super"
+            class="px-3 py-1.5 rounded-xl text-xs font-bold bg-white text-slate-900 shadow-sm transition">
+            Super Admin View
+          </button>
+          <button onclick="setAdminRole('staff')" id="role-btn-staff"
+            class="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 transition">
+            Staff Admin View
+          </button>
+        </div>
+
+        <!-- Master Shop Open / Close Toggle -->
+        <div class="flex items-center gap-2.5 px-4 py-2 rounded-2xl border border-slate-200 bg-slate-50">
+          <span class="text-xs font-bold text-slate-700">Shop Status:</span>
+          <button onclick="toggleShopStatus()" id="admin-shop-toggle-btn"
+            class="px-3 py-1 rounded-xl text-xs font-extrabold bg-emerald-600 text-white shadow-sm transition">
+            OPEN
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick KPI Metrics Row -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="flex items-center justify-between text-slate-500 text-xs font-semibold">
+          <span>Active Products</span>
+          <i data-lucide="package" class="w-4 h-4 text-brand-teal"></i>
+        </div>
+        <div id="kpi-products" class="text-2xl font-extrabold text-slate-900 mt-2">8</div>
+        <div class="text-[11px] text-emerald-600 font-medium mt-1">Across 4 categories</div>
+      </div>
+      <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="flex items-center justify-between text-slate-500 text-xs font-semibold">
+          <span>Customer Orders</span>
+          <i data-lucide="shopping-bag" class="w-4 h-4 text-brand-amber"></i>
+        </div>
+        <div id="kpi-orders" class="text-2xl font-extrabold text-slate-900 mt-2">2</div>
+        <div class="text-[11px] text-slate-500 font-medium mt-1">In-house delivery tracking</div>
+      </div>
+      <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="flex items-center justify-between text-slate-500 text-xs font-semibold">
+          <span>Visit Bookings</span>
+          <i data-lucide="calendar" class="w-4 h-4 text-purple-600"></i>
+        </div>
+        <div id="kpi-bookings" class="text-2xl font-extrabold text-slate-900 mt-2">2</div>
+        <div class="text-[11px] text-purple-600 font-medium mt-1">Vet & grooming slots</div>
+      </div>
+      <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="flex items-center justify-between text-slate-500 text-xs font-semibold">
+          <span>Ad Revenue Slot</span>
+          <i data-lucide="trending-up" class="w-4 h-4 text-emerald-600"></i>
+        </div>
+        <div id="kpi-ad-status" class="text-2xl font-extrabold text-emerald-700 mt-2">ACTIVE</div>
+        <div class="text-[11px] text-slate-500 font-medium mt-1">Monetizing homepage banner</div>
+      </div>
+    </div>
+
+    <!-- Admin Sub-Navigation Tabs -->
+    <div class="flex items-center gap-2 overflow-x-auto pb-1">
+      <button onclick="switchAdminTab('products')" id="admin-tab-products"
+        class="admin-subtab px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold bg-brand-teal text-white shadow-sm shrink-0">
+        Products, Prices & Policies
+      </button>
+      <button onclick="switchAdminTab('orders')" id="admin-tab-orders"
+        class="admin-subtab px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 shrink-0">
+        Orders & Delivery Updates
+      </button>
+      <button onclick="switchAdminTab('bookings')" id="admin-tab-bookings"
+        class="admin-subtab px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 shrink-0">
+        Clinic & Visit Appointments
+      </button>
+      <button onclick="switchAdminTab('settings')" id="admin-tab-settings"
+        class="admin-subtab px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 shrink-0">
+        Shop Timings, Ads & Store Policies
+      </button>
+      <button onclick="switchAdminTab('admins')" id="admin-tab-admins"
+        class="admin-subtab px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 shrink-0 flex items-center gap-1.5">
+        <i data-lucide="user-plus" class="w-4 h-4"></i>
+        Manage Admins (Super Admin)
+      </button>
+    </div>
+
+    <!-- ADMIN TAB 1: PRODUCTS, CATEGORIES, PRICES & PER-PRODUCT POLICIES -->
+    <section id="admin-panel-products" class="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200 shadow-sm space-y-5">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900">Catalog, Pricing, Offers & Per-Product Policy Manager</h2>
+          <p class="text-xs text-slate-500">
+            Edit market price, your selling price, optional offer tags (or leave blank), stock, usage instructions, delivery days & product-specific return rules.
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button onclick="openCategoryModal()"
+            class="px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold flex items-center gap-1.5 transition">
+            <i data-lucide="folder-plus" class="w-4 h-4"></i>
+            + Add Category
+          </button>
+          <button onclick="openProductEditorModal()"
+            class="px-4 py-2.5 rounded-2xl bg-brand-amber hover:bg-orange-600 text-white text-xs font-bold flex items-center gap-1.5 shadow transition">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            + Add New Product
+          </button>
+        </div>
+      </div>
+
+      <!-- Responsive Table -->
+      <div class="overflow-x-auto border border-slate-200 rounded-2xl">
+        <table class="w-full text-left border-collapse text-xs sm:text-sm">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 text-xs uppercase">
+              <th class="py-3.5 px-4 font-bold">Product & Category</th>
+              <th class="py-3.5 px-4 font-bold">Market vs Our Price</th>
+              <th class="py-3.5 px-4 font-bold">Offer Tag</th>
+              <th class="py-3.5 px-4 font-bold">Stock & Status</th>
+              <th class="py-3.5 px-4 font-bold">Delivery & Return Policy</th>
+              <th class="py-3.5 px-4 font-bold text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="admin-products-tbody" class="divide-y divide-slate-100">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ADMIN TAB 2: ORDERS & DELIVERY MANAGEMENT -->
+    <section id="admin-panel-orders" class="hidden bg-white rounded-3xl p-5 sm:p-6 border border-slate-200 shadow-sm space-y-5">
+      <div>
+        <h2 class="text-lg font-bold text-slate-900">Orders & In-House Delivery Management</h2>
+        <p class="text-xs text-slate-500">
+          Orders placed in the Customer Store tab appear here immediately. Update delivery progress in real time.
+        </p>
+      </div>
+      <div id="admin-orders-list" class="space-y-4">
+        <!-- Populated by JS -->
+      </div>
+    </section>
+
+    <!-- ADMIN TAB 3: APPOINTMENTS & VISIT BOOKINGS -->
+    <section id="admin-panel-bookings" class="hidden bg-white rounded-3xl p-5 sm:p-6 border border-slate-200 shadow-sm space-y-5">
+      <div>
+        <h2 class="text-lg font-bold text-slate-900">Customer Store Visits, Grooming & Vet Appointments</h2>
+        <p class="text-xs text-slate-500">
+          Confirm or reschedule customer visit bookings made through the website.
+        </p>
+      </div>
+      <div id="admin-bookings-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Populated by JS -->
+      </div>
+    </section>
+
+    <!-- ADMIN TAB 4: TIMINGS, ADS & STORE POLICIES -->
+    <section id="admin-panel-settings" class="hidden bg-white rounded-3xl p-5 sm:p-6 border border-slate-200 shadow-sm space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Shop Timings & Status -->
+        <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
+          <h3 class="font-bold text-slate-900 flex items-center gap-2">
+            <i data-lucide="clock" class="w-4 h-4 text-brand-teal"></i>
+            Shop Timings & Next-Working-Day Rule
+          </h3>
+          <div class="grid grid-cols-2 gap-3 text-xs">
+            <div>
+              <label class="block font-semibold text-slate-600 mb-1">Opening Time</label>
+              <input type="text" id="setting-open-time" value="9:00 AM" class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white font-semibold" />
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-600 mb-1">Closing Time</label>
+              <input type="text" id="setting-close-time" value="9:00 PM" class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white font-semibold" />
+            </div>
+          </div>
+          <div class="flex items-center justify-between pt-2">
+            <span class="text-xs text-slate-600">Current Storefront State:</span>
+            <button onclick="toggleShopStatus()" class="px-4 py-2 rounded-xl bg-brand-teal text-white text-xs font-bold">
+              Toggle Open / Closed
+            </button>
+          </div>
+        </div>
+
+        <!-- Running Ads Monetization Manager -->
+        <div class="p-5 rounded-2xl bg-amber-50/70 border border-amber-200 space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold text-slate-900 flex items-center gap-2">
+              <i data-lucide="megaphone" class="w-4 h-4 text-brand-amber"></i>
+              Sponsored Ad Banner (Extra Revenue)
+            </h3>
+            <label class="inline-flex items-center gap-2 cursor-pointer text-xs font-bold">
+              <input type="checkbox" id="setting-ad-enabled" checked onchange="updateAdBannerSettings()" class="w-4 h-4 accent-brand-amber" />
+              <span>Show Ads</span>
+            </label>
+          </div>
+          <div class="space-y-2.5 text-xs">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Sponsored Headline</label>
+              <input type="text" id="setting-ad-title" value="Royal Paw Nutrition — Get 15% Extra Protein Formula for Active Dogs!"
+                oninput="updateAdBannerSettings()" class="w-full px-3 py-2 rounded-xl border border-amber-300 bg-white" />
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Sponsor Subtext</label>
+              <input type="text" id="setting-ad-subtitle" value="Partner brands pay you monthly to display featured promotions right here. Toggleable in Admin Panel."
+                oninput="updateAdBannerSettings()" class="w-full px-3 py-2 rounded-xl border border-amber-300 bg-white" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Store-Wide Policy Editor -->
+      <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
+        <h3 class="font-bold text-slate-900">Store-Wide Policy Pages Editor (Return, Refund & Security)</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">General Return Policy</label>
+            <textarea id="policy-edit-return" rows="4" class="w-full p-3 rounded-xl border border-slate-300 bg-white">Unopened pet food and accessories can be returned within 7 days of delivery. Note: Temperature-sensitive veterinary medicines follow product-specific return rules shown on each item.</textarea>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Refund Policy</label>
+            <textarea id="policy-edit-refund" rows="4" class="w-full p-3 rounded-xl border border-slate-300 bg-white">Approved refunds are credited back to your original payment method (UPI, Card, or Bank Account) within 3–5 business days after pickup verification.</textarea>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Security & Privacy Policy</label>
+            <textarea id="policy-edit-security" rows="4" class="w-full p-3 rounded-xl border border-slate-300 bg-white">All online payments are encrypted via 256-bit SSL gateways. Customer addresses and pet health records are strictly confidential and never sold to third parties.</textarea>
+          </div>
+        </div>
+        <button onclick="saveStorePolicies()" class="px-5 py-2.5 rounded-xl bg-brand-teal hover:bg-brand-tealDark text-white text-xs font-bold transition">
+          Save Policy Updates Live
+        </button>
+      </div>
+    </section>
+
+    <!-- ADMIN TAB 5: SUPER ADMIN USER & ROLE MANAGEMENT -->
+    <section id="admin-panel-admins" class="hidden bg-white rounded-3xl p-5 sm:p-6 border border-slate-200 shadow-sm space-y-5">
+      <div id="super-admin-locked-notice" class="hidden p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs sm:text-sm flex items-center justify-between gap-3">
+        <div class="flex items-center gap-2">
+          <i data-lucide="lock" class="w-5 h-5 shrink-0"></i>
+          <span><strong>Restricted Area:</strong> You are currently previewing as a <strong>Staff Admin</strong>. Switch to <strong>Super Admin View</strong> at the top right to create or remove admin accounts.</span>
+        </div>
+        <button onclick="setAdminRole('super')" class="px-3 py-1.5 rounded-xl bg-rose-700 text-white text-xs font-bold shrink-0">
+          Switch to Super Admin
+        </button>
+      </div>
+
+      <div id="super-admin-controls" class="space-y-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900">Super Admin & Staff Access Control</h2>
+            <p class="text-xs text-slate-500">
+              As the shop owner (Super Admin), you can create staff accounts for billing, inventory, or delivery updates while protecting critical settings.
+            </p>
+          </div>
+        </div>
+
+        <!-- Add New Admin Form -->
+        <form onsubmit="handleAddAdminUser(event)" class="grid grid-cols-1 sm:grid-cols-4 gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs">
+          <input type="text" id="new-admin-name" required placeholder="Staff Name (e.g., Karthik R.)"
+            class="px-3 py-2.5 rounded-xl border border-slate-300 bg-white" />
+          <input type="email" id="new-admin-email" required placeholder="Email / Login ID"
+            class="px-3 py-2.5 rounded-xl border border-slate-300 bg-white" />
+          <select id="new-admin-role" class="px-3 py-2.5 rounded-xl border border-slate-300 bg-white font-semibold">
+            <option value="Inventory & Orders Admin">Inventory & Orders Admin</option>
+            <option value="Delivery & Bookings Manager">Delivery & Bookings Manager</option>
+            <option value="Co-Super Admin">Co-Super Admin (Full Access)</option>
+          </select>
+          <button type="submit" class="px-4 py-2.5 rounded-xl bg-brand-teal hover:bg-brand-tealDark text-white font-bold transition">
+            + Create Admin Account
+          </button>
+        </form>
+
+        <!-- Admin Users List -->
+        <div id="admin-users-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- =====================================================================
+       MODAL 1: PRODUCT DETAIL MODAL (Usage, Return/Refund Policy, Delivery)
+  ====================================================================== -->
+  <div id="product-detail-modal" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 p-6 space-y-5">
+      <div class="flex items-start justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div id="modal-prod-icon" class="w-14 h-14 rounded-2xl bg-brand-tealLight text-brand-teal flex items-center justify-center text-2xl shrink-0"></div>
+          <div>
+            <span id="modal-prod-category" class="text-xs font-bold uppercase tracking-wider text-brand-amber"></span>
+            <h3 id="modal-prod-name" class="text-xl font-extrabold text-slate-900"></h3>
+          </div>
+        </div>
+        <button onclick="closeModal('product-detail-modal')" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <p id="modal-prod-desc" class="text-sm text-slate-600 leading-relaxed"></p>
+
+      <!-- Pricing & Offer Block -->
+      <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <span class="text-xs text-slate-500 block">Special Store Price</span>
+          <div class="flex items-baseline gap-2.5 mt-0.5">
+            <span id="modal-prod-price" class="text-2xl font-extrabold text-brand-tealDark"></span>
+            <span id="modal-prod-market" class="text-sm text-slate-400 line-through"></span>
+            <span id="modal-prod-offer" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-brand-amber text-white"></span>
+          </div>
+        </div>
+        <div id="modal-prod-stock" class="text-xs font-bold px-3 py-1.5 rounded-xl bg-emerald-100 text-emerald-800"></div>
+      </div>
+
+      <!-- Structured Details: Usage, Delivery Days, Return & Refund Rules -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+        <div class="p-3.5 rounded-2xl bg-brand-tealLight/60 border border-brand-teal/15 space-y-1">
+          <div class="font-bold text-brand-tealDark flex items-center gap-1.5">
+            <i data-lucide="info" class="w-4 h-4"></i> Used For / Dosage & Usage
+          </div>
+          <p id="modal-prod-usage" class="text-slate-700 leading-relaxed"></p>
+        </div>
+        <div class="p-3.5 rounded-2xl bg-amber-50 border border-amber-200/70 space-y-1">
+          <div class="font-bold text-amber-900 flex items-center gap-1.5">
+            <i data-lucide="truck" class="w-4 h-4"></i> Estimated Delivery
+          </div>
+          <p id="modal-prod-delivery" class="text-slate-700 leading-relaxed"></p>
+        </div>
+        <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+          <div class="font-bold text-slate-900 flex items-center gap-1.5">
+            <i data-lucide="rotate-ccw" class="w-4 h-4 text-brand-amber"></i> Product Return Policy
+          </div>
+          <p id="modal-prod-return" class="text-slate-600 leading-relaxed"></p>
+        </div>
+        <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+          <div class="font-bold text-slate-900 flex items-center gap-1.5">
+            <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600"></i> Product Refund Policy
+          </div>
+          <p id="modal-prod-refund" class="text-slate-600 leading-relaxed"></p>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-3 pt-2">
+        <button onclick="closeModal('product-detail-modal')" class="px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold">
+          Close
+        </button>
+        <button id="modal-prod-add-btn" class="px-6 py-2.5 rounded-2xl bg-brand-teal hover:bg-brand-tealDark text-white text-xs sm:text-sm font-bold flex items-center gap-2 shadow">
+          <i data-lucide="shopping-cart" class="w-4 h-4"></i>
+          Add to Cart
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       MODAL 2: SHOPPING CART & ONLINE CHECKOUT DRAWER
+  ====================================================================== -->
+  <div id="cart-drawer-modal" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-xs flex justify-end">
+    <div class="bg-white w-full max-w-lg h-full flex flex-col shadow-2xl">
+      <div class="p-5 border-b border-slate-200 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i data-lucide="shopping-bag" class="w-5 h-5 text-brand-teal"></i>
+          <h3 class="font-display font-extrabold text-lg text-slate-900">Your Pet Cart & Checkout</h3>
+        </div>
+        <button onclick="closeModal('cart-drawer-modal')" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-5 space-y-5">
+        <!-- Cart Items List -->
+        <div id="cart-items-container" class="space-y-3">
+          <!-- Injected by JS -->
+        </div>
+
+        <!-- Delivery & Payment Form (Visible when cart has items) -->
+        <form id="checkout-form" onsubmit="handlePlaceOrder(event)" class="hidden space-y-4 pt-4 border-t border-slate-200">
+          <!-- Dynamic Delivery Calculation Alert -->
+          <div id="checkout-delivery-notice" class="p-3.5 rounded-2xl text-xs space-y-1">
+            <!-- Dynamically updated based on Open/Closed shop status -->
+          </div>
+
+          <div class="space-y-3 text-xs">
+            <h4 class="font-bold text-slate-900 text-sm">1. Delivery Address Details</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <input type="text" id="cust-name" required placeholder="Full Name" value="Ananya Sharma"
+                class="px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-brand-teal focus:outline-none" />
+              <input type="tel" id="cust-phone" required placeholder="Mobile Number" value="+91 98401 22345"
+                class="px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-brand-teal focus:outline-none" />
+            </div>
+            <textarea id="cust-address" required rows="2" placeholder="House/Flat No., Street, Landmark, City & Pincode"
+              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-brand-teal focus:outline-none">Flat 4B, Green Meadows Apts, Anna Nagar, Chennai - 600040</textarea>
+          </div>
+
+          <div class="space-y-2.5 text-xs">
+            <h4 class="font-bold text-slate-900 text-sm">2. Online Payment Method</h4>
+            <div class="grid grid-cols-3 gap-2">
+              <label class="cursor-pointer">
+                <input type="radio" name="paymentMethod" value="UPI Instant Pay" checked class="peer sr-only" />
+                <div class="p-2.5 rounded-xl border border-slate-200 peer-checked:border-brand-teal peer-checked:bg-brand-tealLight/50 text-center font-bold">
+                  UPI / GPay
+                </div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" name="paymentMethod" value="Credit / Debit Card" class="peer sr-only" />
+                <div class="p-2.5 rounded-xl border border-slate-200 peer-checked:border-brand-teal peer-checked:bg-brand-tealLight/50 text-center font-bold">
+                  Card
+                </div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" name="paymentMethod" value="NetBanking" class="peer sr-only" />
+                <div class="p-2.5 rounded-xl border border-slate-200 peer-checked:border-brand-teal peer-checked:bg-brand-tealLight/50 text-center font-bold">
+                  NetBanking
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Order Summary -->
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5 text-xs">
+            <div class="flex justify-between text-slate-600">
+              <span>Items Subtotal</span>
+              <span id="cart-subtotal" class="font-semibold">₹0</span>
+            </div>
+            <div class="flex justify-between text-slate-600">
+              <span>Shop-Managed Safe Delivery</span>
+              <span class="font-semibold text-emerald-700">FREE</span>
+            </div>
+            <div class="flex justify-between text-base font-extrabold text-slate-900 pt-2 border-t border-slate-200">
+              <span>Total Payable</span>
+              <span id="cart-total">₹0</span>
+            </div>
+          </div>
+
+          <button type="submit" class="w-full py-3.5 rounded-2xl bg-brand-amber hover:bg-orange-600 text-white font-bold text-sm shadow-lg transition flex items-center justify-center gap-2">
+            <i data-lucide="lock" class="w-4 h-4"></i>
+            Pay Online & Confirm Order
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       MODAL 3: SERVICE / VET / STORE VISIT APPOINTMENT BOOKING MODAL
+  ====================================================================== -->
+  <div id="booking-modal" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-200 p-6 space-y-5">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-2xl bg-brand-amberSoft text-brand-amber flex items-center justify-center">
+            <i data-lucide="calendar-heart" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-display font-extrabold text-lg text-slate-900">Book Visit / Pet Service</h3>
+            <p class="text-xs text-slate-500">Reserve a slot for vet consultation, grooming, or store visit</p>
+          </div>
+        </div>
+        <button onclick="closeModal('booking-modal')" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form onsubmit="handleBookAppointment(event)" class="space-y-3.5 text-xs">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Owner Name</label>
+            <input type="text" id="book-owner" required placeholder="Your Name" value="Rahul Verma"
+              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300" />
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Phone Number</label>
+            <input type="tel" id="book-phone" required placeholder="Mobile Number" value="+91 98409 77881"
+              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Pet Type & Name</label>
+            <input type="text" id="book-pet" required placeholder="e.g., Golden Retriever (Max)" value="Beagle (Bruno)"
+              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300" />
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Select Service</label>
+            <select id="book-service" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white font-semibold">
+              <option value="Full Bath & Grooming Spa">Full Bath & Grooming Spa</option>
+              <option value="Vet Health Checkup & Vaccination">Vet Health Checkup & Vaccination</option>
+              <option value="Nutrition & Diet Consultation">Nutrition & Diet Consultation</option>
+              <option value="In-Store Pet Shopping Visit">In-Store Pet Shopping Visit</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Preferred Date</label>
+            <input type="date" id="book-date" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300" />
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Time Slot</label>
+            <select id="book-slot" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white font-semibold">
+              <option value="10:30 AM - 11:30 AM">10:30 AM - 11:30 AM</option>
+              <option value="12:00 PM - 01:00 PM">12:00 PM - 01:00 PM</option>
+              <option value="04:30 PM - 05:30 PM">04:30 PM - 05:30 PM</option>
+              <option value="06:30 PM - 07:30 PM">06:30 PM - 07:30 PM</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="w-full py-3 rounded-2xl bg-brand-teal hover:bg-brand-tealDark text-white font-bold text-sm shadow transition">
+          Confirm Appointment Slot
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       MODAL 4: ADMIN ADD / EDIT PRODUCT MODAL (With Per-Product Policy)
+  ====================================================================== -->
+  <div id="product-editor-modal" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 p-6 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 id="editor-modal-title" class="font-display font-extrabold text-lg text-slate-900">Add / Edit Product</h3>
+        <button onclick="closeModal('product-editor-modal')" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form onsubmit="handleSaveProduct(event)" class="space-y-3.5 text-xs">
+        <input type="hidden" id="edit-prod-id" />
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Product Name *</label>
+            <input type="text" id="edit-prod-name" required placeholder="e.g., Royal Canin Puppy 3kg"
+              class="w-full px-3 py-2 rounded-xl border border-slate-300" />
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Category *</label>
+            <select id="edit-prod-category" class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white font-semibold">
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Market Price (₹) *</label>
+            <input type="number" id="edit-prod-market" required min="1" placeholder="1200"
+              class="w-full px-3 py-2 rounded-xl border border-slate-300" />
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Our Price (₹) *</label>
+            <input type="number" id="edit-prod-price" required min="1" placeholder="999"
+              class="w-full px-3 py-2 rounded-xl border border-slate-300" />
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Offer Badge (Optional)</label>
+            <input type="text" id="edit-prod-offer" placeholder="Leave blank or e.g. 15% OFF"
+              class="w-full px-3 py-2 rounded-xl border border-slate-300" />
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Stock Qty *</label>
+            <input type="number" id="edit-prod-stock" required min="0" placeholder="25"
+              class="w-full px-3 py-2 rounded-xl border border-slate-300" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Delivery Days (When Shop Open) *</label>
+            <input type="number" id="edit-prod-days" required min="1" max="15" value="2"
+              class="w-full px-3 py-2 rounded-xl border border-slate-300" />
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Icon / Emoji</label>
+            <input type="text" id="edit-prod-emoji" value="🦴" maxlength="4"
+              class="w-full px-3 py-2 rounded-xl border border-slate-300" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Product Description *</label>
+          <textarea id="edit-prod-desc" required rows="2" placeholder="Describe ingredients, benefits, pack size..."
+            class="w-full px-3 py-2 rounded-xl border border-slate-300"></textarea>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Used For / Dosage & Usage Instructions *</label>
+          <input type="text" id="edit-prod-usage" required placeholder="e.g., Daily nutrition for adult dogs above 12 months"
+            class="w-full px-3 py-2 rounded-xl border border-slate-300" />
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Per-Product Return Policy *</label>
+            <input type="text" id="edit-prod-return" required value="7-day return if seal is intact"
+              class="w-full px-3 py-2 rounded-xl border border-slate-300" />
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Per-Product Refund Policy *</label>
+            <input type="text" id="edit-prod-refund" required value="Full refund within 3 business days"
+              class="w-full px-3 py-2 rounded-xl border border-slate-300" />
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeModal('product-editor-modal')" class="px-4 py-2.5 rounded-xl bg-slate-100 font-bold text-slate-700">
+            Cancel
+          </button>
+          <button type="submit" class="px-6 py-2.5 rounded-xl bg-brand-teal hover:bg-brand-tealDark text-white font-bold shadow">
+            Save Product to Store
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       MODAL 5: POLICY VIEWER MODAL (Return, Refund, Security)
+  ====================================================================== -->
+  <div id="policy-viewer-modal" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-200 p-6 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 id="policy-modal-title" class="font-display font-extrabold text-lg text-brand-tealDark">Policy Details</h3>
+        <button onclick="closeModal('policy-viewer-modal')" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <p id="policy-modal-body" class="text-sm text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-2xl border border-slate-200"></p>
+      <div class="flex justify-end">
+        <button onclick="closeModal('policy-viewer-modal')" class="px-5 py-2 rounded-xl bg-brand-teal text-white text-xs font-bold">
+          Got It
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       APPLICATION STATE & INTERACTIVE LOGIC
+  ====================================================================== -->
+  <script>
+    // -----------------------------------------------------------------------
+    // 1. CENTRALIZED APPLICATION STATE (Synced across Blueprint, Store & Admin)
+    // -----------------------------------------------------------------------
+    const appState = {
+      isShopOpen: true,
+      openTime: "9:00 AM",
+      closeTime: "9:00 PM",
+      adminRole: "super", // 'super' or 'staff'
+      selectedCategory: "All",
+      pitchTipsVisible: true,
+
+      adBanner: {
+        enabled: true,
+        title: "Royal Paw Nutrition — Get 15% Extra Protein Formula for Active Dogs!",
+        subtitle: "Partner brands pay you monthly to display featured promotions right here. Toggleable in Admin Panel."
+      },
+
+      storePolicies: {
+        return: "Unopened pet food and accessories can be returned within 7 days of delivery. Note: Temperature-sensitive veterinary medicines follow product-specific return rules shown on each item.",
+        refund: "Approved refunds are credited back to your original payment method (UPI, Card, or Bank Account) within 3–5 business days after pickup verification.",
+        security: "All online payments are encrypted via 256-bit SSL gateways. Customer addresses and pet health records are strictly confidential and never sold to third parties."
+      },
+
+      categories: [
+        { id: "cat-1", name: "Pet Food", description: "Dry kibble, wet pouches & prescription diets" },
+        { id: "cat-2", name: "Medicines & Care", description: "Dewormers, tick/flea drops, skin & digestive meds" },
+        { id: "cat-3", name: "Supplements", description: "Calcium, coat omega oils & immunity boosters" },
+        { id: "cat-4", name: "Accessories & Hygiene", description: "Shampoos, leashes, bowls & dental chews" }
+      ],
+
+      products: [
+        {
+          id: "p1",
+          name: "Adult Dog Chicken & Rice Nutrition (3 kg)",
+          category: "Pet Food",
+          emoji: "🐕",
+          marketPrice: 1450,
+          ourPrice: 1199,
+          offerTag: "17% OFF",
+          stock: 28,
+          deliveryDays: 1,
+          description: "High-digestibility protein formula enriched with prebiotics, glucosamine, and omega-6 for healthy skin and strong muscles.",
+          usage: "Daily complete meal for adult dogs (1–7 years). Serve 150g–300g split into two meals.",
+          returnPolicy: "7-day return if outer bag seal is unbroken.",
+          refundPolicy: "100% refund within 3 working days after pickup."
+        },
+        {
+          id: "p2",
+          name: "Broad-Spectrum Pet Dewormer Tablets (Pack of 4)",
+          category: "Medicines & Care",
+          emoji: "💊",
+          marketPrice: 480,
+          ourPrice: 420,
+          offerTag: "VET APPROVED",
+          stock: 42,
+          deliveryDays: 1,
+          description: "Veterinary-grade broad-spectrum internal parasite control tablet effective against roundworms, hookworms, and tapeworms.",
+          usage: "1 tablet per 10 kg body weight once every 3 months, or as prescribed by your vet.",
+          returnPolicy: "Non-returnable once blister strip is opened (Pharmacy safety rule).",
+          refundPolicy: "Full refund if damaged or expired upon delivery."
+        },
+        {
+          id: "p3",
+          name: "Tick & Flea Spot-On Solution (Medium Dogs)",
+          category: "Medicines & Care",
+          emoji: "🛡️",
+          marketPrice: 650,
+          ourPrice: 549,
+          offerTag: "SAVE ₹101",
+          stock: 19,
+          deliveryDays: 1,
+          description: "Fast-acting topical pipette that eliminates ticks, fleas, and chewing lice within 24 hours and protects for 30 days.",
+          usage: "Part fur between shoulder blades and apply directly to skin once monthly.",
+          returnPolicy: "Returnable within 5 days only in sealed factory box.",
+          refundPolicy: "Instant wallet or bank refund on verified sealed return."
+        },
+        {
+          id: "p4",
+          name: "Salmon & Tuna Kitten Gravy Pouches (12 x 85g)",
+          category: "Pet Food",
+          emoji: "🐈",
+          marketPrice: 720,
+          ourPrice: 610,
+          offerTag: "", // Intentionally blank to show optional offer system!
+          stock: 34,
+          deliveryDays: 2,
+          description: "Tender ocean fish chunks in taurine-rich gravy formulated for growing kittens (2–12 months) to support vision and brain health.",
+          usage: "Feed 2–3 pouches daily for kittens alongside fresh drinking water.",
+          returnPolicy: "7-day return for unopened multipack box.",
+          refundPolicy: "Refund processed within 3–5 business days."
+        },
+        {
+          id: "p5",
+          name: "Omega-3 & Biotin Coat Shine Syrup (200 ml)",
+          category: "Supplements",
+          emoji: "✨",
+          marketPrice: 520,
+          ourPrice: 445,
+          offerTag: "BESTSELLER",
+          stock: 15,
+          deliveryDays: 2,
+          description: "Cold-pressed salmon oil fortified with zinc and biotin to reduce excessive shedding, itching, and flaky skin.",
+          usage: "Mix 5 ml daily into food for dogs & cats.",
+          returnPolicy: "7-day return if bottle cap seal is intact.",
+          refundPolicy: "Full refund within 3 business days."
+        },
+        {
+          id: "p6",
+          name: "Oatmeal & Aloe Soothing Anti-Itch Shampoo (250 ml)",
+          category: "Accessories & Hygiene",
+          emoji: "🧴",
+          marketPrice: 390,
+          ourPrice: 325,
+          offerTag: "", // Intentionally blank
+          stock: 22,
+          deliveryDays: 2,
+          description: "pH-balanced, tear-free herbal shampoo that calms sensitive skin and leaves coats soft and fresh.",
+          usage: "Lather gently on wet coat, leave for 5 minutes, rinse thoroughly.",
+          returnPolicy: "7-day return if unused and sealed.",
+          refundPolicy: "Full refund within 3 business days."
+        }
+      ],
+
+      cart: [
+        { productId: "p1", qty: 1 },
+        { productId: "p2", qty: 1 }
+      ],
+
+      orders: [
+        {
+          id: "ORD-8841",
+          customerName: "Priya Nair",
+          phone: "+91 98402 11223",
+          address: "14, Beach Road, Besant Nagar, Chennai - 600090",
+          itemsSummary: "Adult Dog Chicken & Rice (1), Dewormer Pack (1)",
+          total: 1619,
+          paymentMethod: "UPI Instant Pay",
+          placedWhileClosed: false,
+          estimatedDelivery: "Tomorrow (1–2 Days)",
+          status: "Out for Delivery"
+        },
+        {
+          id: "ORD-8840",
+          customerName: "Vikram Menon",
+          phone: "+91 98410 55443",
+          address: "22, Lotus Colony, T. Nagar, Chennai - 600017",
+          itemsSummary: "Tick & Flea Spot-On (2)",
+          total: 1098,
+          paymentMethod: "Credit / Debit Card",
+          placedWhileClosed: true,
+          estimatedDelivery: "Next Working Day + 1 Day (Ordered After Hours)",
+          status: "Packed & Ready"
+        }
+      ],
+
+      bookings: [
+        {
+          id: "APT-301",
+          owner: "Meera Krishnan",
+          phone: "+91 98840 33221",
+          pet: "Shih Tzu (Coco)",
+          service: "Full Bath & Grooming Spa",
+          date: "2026-11-14",
+          slot: "10:30 AM - 11:30 AM",
+          status: "Confirmed"
+        },
+        {
+          id: "APT-302",
+          owner: "Arjun Das",
+          phone: "+91 97909 44112",
+          pet: "Labrador (Rocky)",
+          service: "Vet Health Checkup & Vaccination",
+          date: "2026-11-14",
+          slot: "04:30 PM - 05:30 PM",
+          status: "Pending Confirmation"
+        }
+      ],
+
+      admins: [
+        { id: "adm-1", name: "Shop Owner (You)", email: "owner@pawsandwellness.in", role: "Super Admin", active: true },
+        { id: "adm-2", name: "Suresh Kumar", email: "suresh.store@pawsandwellness.in", role: "Inventory & Orders Admin", active: true },
+        { id: "adm-3", name: "Divya R.", email: "clinic@pawsandwellness.in", role: "Delivery & Bookings Manager", active: true }
+      ]
+    };
+
+    // -----------------------------------------------------------------------
+    // 2. PRESENTER MASTER NAVIGATION & PITCH GUIDES
+    // -----------------------------------------------------------------------
+    const pitchGuides = {
+      blueprint: "Start here to show the shopkeeper the big picture: how customers buy food & medicines, book clinic visits, how closed-shop orders auto-shift delivery, and how Super Admin controls everything.",
+      storefront: "This is what your customers see! Try searching products, checking per-product return policies, toggling the Shop Open/Closed switch to see delivery dates shift, booking a vet visit, or placing a live order.",
+      admin: "This is your Shopkeeper Control Center! Any order or appointment placed in the Customer Store appears here live. Try adding a product, editing prices/offers, or switching between Super Admin and Staff Admin."
+    };
+
+    function switchMasterView(viewName) {
+      ['blueprint', 'storefront', 'admin'].forEach(v => {
+        const panel = document.getElementById(`view-${v}`);
+        const btn = document.getElementById(`nav-${v}`);
+        if (v === viewName) {
+          panel.classList.remove('hidden');
+          btn.classList.add('bg-white', 'text-brand-tealDark', 'shadow');
+          btn.classList.remove('text-slate-200');
+        } else {
+          panel.classList.add('hidden');
+          btn.classList.remove('bg-white', 'text-brand-tealDark', 'shadow');
+          btn.classList.add('text-slate-200');
+        }
+      });
+
+      document.getElementById('pitch-guide-text').textContent = pitchGuides[viewName];
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      lucide.createIcons();
+    }
+
+    function togglePitchTips() {
+      appState.pitchTipsVisible = !appState.pitchTipsVisible;
+      const banner = document.getElementById('pitch-banner');
+      const btn = document.getElementById('pitch-tips-btn');
+      if (appState.pitchTipsVisible) {
+        banner.classList.remove('hidden');
+        btn.innerHTML = `<i data-lucide="lightbulb" class="w-3.5 h-3.5"></i><span>Pitch Notes: ON</span>`;
+      } else {
+        banner.classList.add('hidden');
+        btn.innerHTML = `<i data-lucide="lightbulb" class="w-3.5 h-3.5"></i><span>Pitch Notes: OFF</span>`;
+      }
+      lucide.createIcons();
+    }
+
+    // -----------------------------------------------------------------------
+    // 3. WORKFLOW BLUEPRINT INTERACTIVE DIAGRAMS
+    // -----------------------------------------------------------------------
+    const workflowDiagrams = {
+      customer: {
+        title: "Customer Shopping, Payment & Smart Delivery Flow",
+        subtitle: "How a pet parent discovers food/medicines, checks policies, pays online, and receives accurate delivery timelines.",
+        steps: [
+          { icon: "search", title: "1. Browse & Search", desc: "Filter by Food, Pharmacy, Supplements, or search by pet symptom/product name." },
+          { icon: "file-check", title: "2. Inspect Details & Policies", desc: "View Market vs Offer price, usage instructions, and per-product return/refund rules." },
+          { icon: "credit-card", title: "3. Cart & Online Payment", desc: "Enter delivery address and pay securely via UPI, Card, or NetBanking." },
+          { icon: "clock", title: "4. Open/Closed Date Check", desc: "System checks if shop is OPEN (standard days) or CLOSED (auto +1 working day)." },
+          { icon: "truck", title: "5. In-House Delivery", desc: "Your shop team packs & delivers safely with live status updates." }
+        ]
+      },
+      booking: {
+        title: "In-Store Visit, Grooming & Vet Consultation Flow",
+        subtitle: "Turn online visitors into foot-traffic customers with zero scheduling friction.",
+        steps: [
+          { icon: "calendar-plus", title: "1. Select Service", desc: "Customer picks Grooming Spa, Vet Checkup, Vaccination, or Diet Advice." },
+          { icon: "paw-print", title: "2. Enter Pet Details", desc: "Captures pet breed/name and owner contact number for preparation." },
+          { icon: "clock", title: "3. Pick Date & Slot", desc: "Chooses an available morning or evening slot." },
+          { icon: "bell-ring", title: "4. Instant Confirmation", desc: "Booking appears immediately in your Admin Panel for confirmation." }
+        ]
+      },
+      admin: {
+        title: "Super Admin & Staff Role-Based Hierarchy",
+        subtitle: "Complete shopkeeper authority with safe delegation to store employees.",
+        steps: [
+          { icon: "crown", title: "Super Admin (Owner)", desc: "Full control: create/remove staff admins, set shop open/close, pricing, policies & ads." },
+          { icon: "user-check", title: "Staff Admin Accounts", desc: "Restricted access: update stock, pack orders, update delivery status & manage bookings." },
+          { icon: "sliders", title: "Per-Product Rules", desc: "Set custom return/refund rules per item (e.g., strict pharmacy rules vs 7-day food return)." },
+          { icon: "bar-chart-3", title: "Live Store Sync", desc: "Every price, stock, or open/close change updates the customer website instantly." }
+        ]
+      },
+      monetization: {
+        title: "Ad Monetization & Future Expansion Architecture",
+        subtitle: "Designed to generate extra passive income and scale effortlessly.",
+        steps: [
+          { icon: "megaphone", title: "1. Brand Ad Slots", desc: "Charge pet food & pharma brands monthly to feature banners on your homepage." },
+          { icon: "repeat", title: "2. Auto-Refill Subscriptions", desc: "Plug-in module for recurring monthly dog food & medicine deliveries." },
+          { icon: "award", title: "3. Loyalty & Wallet", desc: "Reward repeat buyers with PawPoints redeemable on future orders." },
+          { icon: "smartphone", title: "4. Mobile App Ready", desc: "Shared backend APIs allow launching iOS/Android & Rider apps later." }
+        ]
+      }
+    };
+
+    function selectFlowDiagram(key) {
+      document.querySelectorAll('.flow-selector').forEach(btn => {
+        btn.classList.remove('bg-brand-teal', 'text-white');
+        btn.classList.add('bg-slate-100', 'text-slate-700');
+      });
+      const activeBtn = document.getElementById(`flow-btn-${key}`);
+      activeBtn.classList.remove('bg-slate-100', 'text-slate-700');
+      activeBtn.classList.add('bg-brand-teal', 'text-white');
+
+      const data = workflowDiagrams[key];
+      const container = document.getElementById('flow-diagram-content');
+      container.innerHTML = `
+        <div class="p-4 rounded-2xl bg-brand-tealLight/50 border border-brand-teal/15">
+          <h3 class="font-bold text-brand-tealDark text-base">${data.title}</h3>
+          <p class="text-xs sm:text-sm text-slate-600 mt-0.5">${data.subtitle}</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-${data.steps.length} gap-3">
+          ${data.steps.map((step, idx) => `
+            <div class="relative p-4 rounded-2xl bg-slate-50 border border-slate-200 hover:border-brand-teal transition flex flex-col justify-between space-y-2">
+              <div class="flex items-center justify-between">
+                <div class="w-9 h-9 rounded-xl bg-brand-teal text-white flex items-center justify-center shadow-xs">
+                  <i data-lucide="${step.icon}" class="w-4 h-4"></i>
+                </div>
+                ${idx < data.steps.length - 1 ? `<span class="text-brand-amber font-extrabold text-base hidden md:inline">→</span>` : `<span class="text-emerald-600 font-bold text-xs">✓ Done</span>`}
+              </div>
+              <div>
+                <h4 class="font-bold text-slate-900 text-sm">${step.title}</h4>
+                <p class="text-xs text-slate-600 mt-1 leading-relaxed">${step.desc}</p>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      lucide.createIcons();
+    }
+
+    // -----------------------------------------------------------------------
+    // 4. SYNCED SHOP OPEN / CLOSED STATUS & DELIVERY CALCULATION
+    // -----------------------------------------------------------------------
+    function toggleShopStatus() {
+      appState.isShopOpen = !appState.isShopOpen;
+      syncShopStatusUI();
+      renderProducts();
+      updateDeliveryEstimateDisplay();
+      showToast(
+        appState.isShopOpen
+          ? "Shop is now OPEN — Standard same-day dispatch active!"
+          : "Shop is now CLOSED — Orders will automatically schedule delivery for the Next Working Day.",
+        appState.isShopOpen ? "success" : "warning"
+      );
+    }
+
+    function syncShopStatusUI() {
+      const open = appState.isShopOpen;
+
+      // Top Master Header Pill
+      const headerPill = document.getElementById('header-shop-pill');
+      const headerText = document.getElementById('header-shop-text');
+      if (open) {
+        headerPill.className = "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full font-bold text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 hover:bg-emerald-500/30 transition";
+        headerText.textContent = "OPEN NOW";
+      } else {
+        headerPill.className = "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full font-bold text-xs bg-rose-500/20 text-rose-300 border border-rose-400/30 hover:bg-rose-500/30 transition";
+        headerText.textContent = "CLOSED";
+      }
+
+      // Blueprint Simulator Cards Highlight
+      const simOpen = document.getElementById('sim-card-open');
+      const simClosed = document.getElementById('sim-card-closed');
+      if (simOpen && simClosed) {
+        simOpen.className = open
+          ? "p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-50/40 shadow-sm transition-all"
+          : "p-4 rounded-2xl border border-slate-200 opacity-60 transition-all";
+        simClosed.className = !open
+          ? "p-4 rounded-2xl border-2 border-rose-500 bg-rose-50/40 shadow-sm transition-all"
+          : "p-4 rounded-2xl border border-slate-200 opacity-60 transition-all";
+      }
+
+      // Storefront Announcement Bar
+      const storeBar = document.getElementById('store-status-bar');
+      const storeMsg = document.getElementById('store-status-message');
+      if (open) {
+        storeBar.className = "bg-emerald-600 text-white px-4 py-2 text-xs sm:text-sm font-medium transition-colors";
+        storeMsg.innerHTML = `<strong>Shop is OPEN!</strong> Order now for same-day dispatch & rapid local delivery.`;
+      } else {
+        storeBar.className = "bg-rose-700 text-white px-4 py-2 text-xs sm:text-sm font-medium transition-colors";
+        storeMsg.innerHTML = `<strong>Shop is Currently CLOSED.</strong> You can still place orders—delivery will begin on the <strong>Next Working Day</strong>.`;
+      }
+
+      document.getElementById('store-hours-display').textContent = `Hours: ${appState.openTime} – ${appState.closeTime}`;
+
+      // Admin Master Toggle Button
+      const adminBtn = document.getElementById('admin-shop-toggle-btn');
+      if (open) {
+        adminBtn.className = "px-3 py-1 rounded-xl text-xs font-extrabold bg-emerald-600 text-white shadow-sm transition";
+        adminBtn.textContent = "OPEN";
+      } else {
+        adminBtn.className = "px-3 py-1 rounded-xl text-xs font-extrabold bg-rose-600 text-white shadow-sm transition";
+        adminBtn.textContent = "CLOSED";
+      }
+    }
+
+    function calculateDeliveryText(baseDays) {
+      const pincode = (document.getElementById('pincode-input')?.value || "600001").trim();
+      const extraZoneDay = pincode.startsWith("600") ? 0 : 1;
+      const closedBuffer = appState.isShopOpen ? 0 : 1;
+      const totalDays = baseDays + extraZoneDay + closedBuffer;
+
+      if (!appState.isShopOpen) {
+        return `Next Working Day dispatch • Est. ${totalDays} day${totalDays > 1 ? 's' : ''}`;
+      }
+      return totalDays === 1 ? "Express 1-Day Delivery" : `Est. ${totalDays} Days Delivery`;
+    }
+
+    function updateDeliveryEstimateDisplay() {
+      const badge = document.getElementById('global-delivery-badge');
+      badge.textContent = calculateDeliveryText(1);
+      badge.className = appState.isShopOpen
+        ? "text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg"
+        : "text-xs font-bold text-rose-700 bg-rose-50 px-2.5 py-1 rounded-lg";
+      renderProducts();
+    }
+
+    // -----------------------------------------------------------------------
+    // 5. CUSTOMER STOREFRONT RENDERING (Categories, Products, Search)
+    // -----------------------------------------------------------------------
+    function renderCategoryPills() {
+      const container = document.getElementById('category-pills-container');
+      const allCats = ["All", ...appState.categories.map(c => c.name)];
+      container.innerHTML = allCats.map(cat => {
+        const active = appState.selectedCategory === cat;
+        return `
+          <button onclick="filterByCategory('${cat}')"
+            class="px-4 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition ${
+              active
+                ? 'bg-brand-teal text-white shadow-sm'
+                : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
+            }">
+            ${cat}
+          </button>
+        `;
+      }).join('');
+    }
+
+    function filterByCategory(cat) {
+      appState.selectedCategory = cat;
+      renderCategoryPills();
+      renderProducts();
+    }
+
+    function filterProducts() {
+      renderProducts();
+    }
+
+    function renderProducts() {
+      const grid = document.getElementById('product-grid');
+      const query = (document.getElementById('store-search-input')?.value || "").toLowerCase().trim();
+
+      const filtered = appState.products.filter(p => {
+        const matchesCat = appState.selectedCategory === "All" || p.category === appState.selectedCategory;
+        const matchesQuery = !query ||
+          p.name.toLowerCase().includes(query) ||
+          p.description.toLowerCase().includes(query) ||
+          p.usage.toLowerCase().includes(query) ||
+          p.category.toLowerCase().includes(query);
+        return matchesCat && matchesQuery;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full bg-white rounded-3xl p-10 text-center border border-slate-200 space-y-2">
+            <div class="text-3xl">🐾</div>
+            <h3 class="font-bold text-slate-900">No matching products found</h3>
+            <p class="text-xs text-slate-500">Try clearing your search filter or selecting "All" categories.</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(p => {
+        const inStock = p.stock > 0;
+        const deliveryLabel = calculateDeliveryText(p.deliveryDays);
+        const hasOffer = p.offerTag && p.offerTag.trim() !== "";
+
+        return `
+          <article class="bg-white rounded-3xl border border-slate-200/90 shadow-xs hover:shadow-md transition flex flex-col justify-between overflow-hidden group">
+            <div class="p-5 space-y-3.5">
+              <!-- Top Badges Row -->
+              <div class="flex items-center justify-between gap-2 min-h-[24px]">
+                <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-brand-tealLight text-brand-teal">
+                  ${p.category}
+                </span>
+                ${hasOffer
+                  ? `<span class="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-brand-amber text-white shadow-xs">${p.offerTag}</span>`
+                  : `<span class="text-[10px] text-slate-400 font-medium">Standard Price</span>`
+                }
+              </div>
+
+              <!-- Emoji / Product Visual -->
+              <div onclick="openProductDetail('${p.id}')" class="cursor-pointer h-28 rounded-2xl bg-gradient-to-br from-slate-50 to-brand-cream border border-slate-100 flex items-center justify-center text-5xl group-hover:scale-[1.03] transition-transform">
+                ${p.emoji || '🐾'}
+              </div>
+
+              <!-- Title & Short Description -->
+              <div class="space-y-1">
+                <h3 onclick="openProductDetail('${p.id}')" class="cursor-pointer font-bold text-slate-900 text-sm sm:text-base leading-snug hover:text-brand-teal transition line-clamp-2">
+                  ${p.name}
+                </h3>
+                <p class="text-xs text-slate-500 line-clamp-2">${p.description}</p>
+              </div>
+
+              <!-- Delivery & Policy Mini-Badges -->
+              <div class="space-y-1 pt-1 text-[11px]">
+                <div class="flex items-center gap-1.5 font-semibold ${appState.isShopOpen ? 'text-emerald-700' : 'text-rose-700'}">
+                  <i data-lucide="truck" class="w-3.5 h-3.5 shrink-0"></i>
+                  <span>${deliveryLabel}</span>
+                </div>
+                <div class="flex items-center gap-1.5 text-slate-500">
+                  <i data-lucide="shield-check" class="w-3.5 h-3.5 text-brand-teal shrink-0"></i>
+                  <span class="truncate">${p.returnPolicy}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bottom Price & Add to Cart Footer -->
+            <div class="px-5 py-4 bg-slate-50/80 border-t border-slate-100 flex items-center justify-between gap-2">
+              <div>
+                <div class="flex items-baseline gap-1.5">
+                  <span class="text-lg font-extrabold text-slate-900">₹${p.ourPrice}</span>
+                  <span class="text-xs text-slate-400 line-through">₹${p.marketPrice}</span>
+                </div>
+                <span class="text-[11px] font-semibold ${inStock ? 'text-emerald-600' : 'text-rose-600'}">
+                  ${inStock ? `In Stock (${p.stock} left)` : 'Out of Stock'}
+                </span>
+              </div>
+
+              <div class="flex items-center gap-1.5">
+                <button onclick="openProductDetail('${p.id}')" title="View Details & Return Policy"
+                  class="p-2.5 rounded-xl bg-white border border-slate-200 hover:border-brand-teal text-slate-600 hover:text-brand-teal transition">
+                  <i data-lucide="eye" class="w-4 h-4"></i>
+                </button>
+                <button onclick="addToCart('${p.id}')" ${!inStock ? 'disabled' : ''}
+                  class="px-3.5 py-2.5 rounded-xl bg-brand-teal hover:bg-brand-tealDark disabled:bg-slate-300 text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition">
+                  <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                  <span>Add</span>
+                </button>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    function openProductDetail(productId) {
+      const p = appState.products.find(item => item.id === productId);
+      if (!p) return;
+
+      document.getElementById('modal-prod-icon').textContent = p.emoji || '🐾';
+      document.getElementById('modal-prod-category').textContent = p.category;
+      document.getElementById('modal-prod-name').textContent = p.name;
+      document.getElementById('modal-prod-desc').textContent = p.description;
+      document.getElementById('modal-prod-price').textContent = `₹${p.ourPrice}`;
+      document.getElementById('modal-prod-market').textContent = `₹${p.marketPrice}`;
+
+      const offerEl = document.getElementById('modal-prod-offer');
+      if (p.offerTag && p.offerTag.trim()) {
+        offerEl.textContent = p.offerTag;
+        offerEl.classList.remove('hidden');
+      } else {
+        offerEl.classList.add('hidden');
+      }
+
+      document.getElementById('modal-prod-stock').textContent = p.stock > 0 ? `Available (${p.stock} units)` : "Out of Stock";
+      document.getElementById('modal-prod-usage').textContent = p.usage;
+      document.getElementById('modal-prod-delivery').textContent = calculateDeliveryText(p.deliveryDays);
+      document.getElementById('modal-prod-return').textContent = p.returnPolicy;
+      document.getElementById('modal-prod-refund').textContent = p.refundPolicy;
+
+      const addBtn = document.getElementById('modal-prod-add-btn');
+      addBtn.onclick = () => {
+        addToCart(p.id);
+        closeModal('product-detail-modal');
+      };
+
+      openModal('product-detail-modal');
+      lucide.createIcons();
+    }
+
+    // -----------------------------------------------------------------------
+    // 6. CART, CHECKOUT & ORDER PLACEMENT FLOW
+    // -----------------------------------------------------------------------
+    function addToCart(productId) {
+      const prod = appState.products.find(p => p.id === productId);
+      if (!prod || prod.stock <= 0) return;
+
+      const existing = appState.cart.find(c => c.productId === productId);
+      if (existing) {
+        if (existing.qty < prod.stock) {
+          existing.qty += 1;
+        } else {
+          showToast("Maximum available stock reached for this item.", "warning");
+          return;
+        }
+      } else {
+        appState.cart.push({ productId, qty: 1 });
+      }
+
+      updateCartBadge();
+      showToast(`Added "${prod.name}" to your cart!`, "success");
+    }
+
+    function updateCartQty(productId, delta) {
+      const idx = appState.cart.findIndex(c => c.productId === productId);
+      if (idx === -1) return;
+
+      const prod = appState.products.find(p => p.id === productId);
+      const nextQty = appState.cart[idx].qty + delta;
+
+      if (nextQty <= 0) {
+        appState.cart.splice(idx, 1);
+      } else if (prod && nextQty <= prod.stock) {
+        appState.cart[idx].qty = nextQty;
+      }
+
+      updateCartBadge();
+      renderCartDrawer();
+    }
+
+    function updateCartBadge() {
+      const totalCount = appState.cart.reduce((sum, item) => sum + item.qty, 0);
+      document.getElementById('cart-badge-count').textContent = totalCount;
+    }
+
+    function openCartDrawer() {
+      renderCartDrawer();
+      openModal('cart-drawer-modal');
+    }
+
+    function renderCartDrawer() {
+      const container = document.getElementById('cart-items-container');
+      const form = document.getElementById('checkout-form');
+
+      if (appState.cart.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12 space-y-2">
+            <div class="text-4xl">🛒</div>
+            <h4 class="font-bold text-slate-800">Your cart is empty</h4>
+            <p class="text-xs text-slate-500">Add pet food, medicines, or accessories from the store to test checkout.</p>
+          </div>
+        `;
+        form.classList.add('hidden');
+        return;
+      }
+
+      let subtotal = 0;
+      container.innerHTML = appState.cart.map(item => {
+        const prod = appState.products.find(p => p.id === item.productId);
+        if (!prod) return '';
+        const lineTotal = prod.ourPrice * item.qty;
+        subtotal += lineTotal;
+
+        return `
+          <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-2xl shrink-0">
+                ${prod.emoji}
+              </div>
+              <div>
+                <h4 class="font-bold text-slate-900 text-xs sm:text-sm line-clamp-1">${prod.name}</h4>
+                <div class="text-xs text-slate-500">₹${prod.ourPrice} × ${item.qty} = <strong class="text-slate-900">₹${lineTotal}</strong></div>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5 bg-white border border-slate-200 rounded-xl p-1">
+              <button type="button" onclick="updateCartQty('${prod.id}', -1)" class="w-6 h-6 rounded-lg hover:bg-slate-100 font-bold text-slate-700">-</button>
+              <span class="px-1.5 text-xs font-bold">${item.qty}</span>
+              <button type="button" onclick="updateCartQty('${prod.id}', 1)" class="w-6 h-6 rounded-lg hover:bg-slate-100 font-bold text-slate-700">+</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('cart-subtotal').textContent = `₹${subtotal}`;
+      document.getElementById('cart-total').textContent = `₹${subtotal}`;
+
+      // Show dynamic Open/Closed delivery calculation inside checkout!
+      const notice = document.getElementById('checkout-delivery-notice');
+      if (appState.isShopOpen) {
+        notice.className = "p-3.5 rounded-2xl text-xs space-y-1 bg-emerald-50 border border-emerald-200 text-emerald-900";
+        notice.innerHTML = `
+          <div class="font-bold flex items-center gap-1.5"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i> Shop is OPEN — Immediate Dispatch</div>
+          <p>Your order will be packed today and delivered by our team within <strong>1–2 working days</strong>.</p>
+        `;
+      } else {
+        notice.className = "p-3.5 rounded-2xl text-xs space-y-1 bg-amber-50 border border-amber-300 text-amber-950";
+        notice.innerHTML = `
+          <div class="font-bold flex items-center gap-1.5"><i data-lucide="clock" class="w-4 h-4 text-brand-amber"></i> Shop is CLOSED — Next Working Day Delivery</div>
+          <p>Since the shop is currently closed, your order is confirmed and scheduled for dispatch on the <strong>Next Working Day morning</strong>.</p>
+        `;
+      }
+
+      form.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function handlePlaceOrder(e) {
+      e.preventDefault();
+      if (appState.cart.length === 0) return;
+
+      const name = document.getElementById('cust-name').value.trim();
+      const phone = document.getElementById('cust-phone').value.trim();
+      const address = document.getElementById('cust-address').value.trim();
+      const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+
+      let total = 0;
+      const summaryParts = [];
+
+      appState.cart.forEach(item => {
+        const prod = appState.products.find(p => p.id === item.productId);
+        if (prod) {
+          total += prod.ourPrice * item.qty;
+          summaryParts.push(`${prod.name} (${item.qty})`);
+          prod.stock = Math.max(0, prod.stock - item.qty);
+        }
+      });
+
+      const newOrder = {
+        id: `ORD-${Math.floor(1000 + Math.random() * 9000)}`,
+        customerName: name,
+        phone,
+        address,
+        itemsSummary: summaryParts.join(", "),
+        total,
+        paymentMethod,
+        placedWhileClosed: !appState.isShopOpen,
+        estimatedDelivery: appState.isShopOpen ? "1–2 Days (Standard Dispatch)" : "Next Working Day Dispatch (+1 Day)",
+        status: "Order Placed (Paid)"
+      };
+
+      appState.orders.unshift(newOrder);
+      appState.cart = [];
+      updateCartBadge();
+      renderProducts();
+      renderAdminDashboard();
+      closeModal('cart-drawer-modal');
+
+      showToast(
+        `Order ${newOrder.id} confirmed! Delivery: ${newOrder.estimatedDelivery}. View it in the Admin Panel tab!`,
+        "success"
+      );
+    }
+
+    // -----------------------------------------------------------------------
+    // 7. SERVICE & VET VISIT APPOINTMENT BOOKING
+    // -----------------------------------------------------------------------
+    function openBookingModal() {
+      const dateInput = document.getElementById('book-date');
+      if (!dateInput.value) {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        dateInput.value = tomorrow.toISOString().split('T')[0];
+      }
+      openModal('booking-modal');
+    }
+
+    function handleBookAppointment(e) {
+      e.preventDefault();
+      const booking = {
+        id: `APT-${Math.floor(100 + Math.random() * 900)}`,
+        owner: document.getElementById('book-owner').value.trim(),
+        phone: document.getElementById('book-phone').value.trim(),
+        pet: document.getElementById('book-pet').value.trim(),
+        service: document.getElementById('book-service').value,
+        date: document.getElementById('book-date').value,
+        slot: document.getElementById('book-slot').value,
+        status: "Confirmed"
+      };
+
+      appState.bookings.unshift(booking);
+      renderAdminDashboard();
+      closeModal('booking-modal');
+      showToast(`Appointment ${booking.id} booked for ${booking.pet} (${booking.service})!`, "success");
+    }
+
+    // -----------------------------------------------------------------------
+    // 8. ADMIN PANEL LOGIC (Catalog, Policies, Orders, Bookings, Super Admin)
+    // -----------------------------------------------------------------------
+    function setAdminRole(role) {
+      appState.adminRole = role;
+      const superBtn = document.getElementById('role-btn-super');
+      const staffBtn = document.getElementById('role-btn-staff');
+      const badge = document.getElementById('admin-role-badge');
+      const lockedNotice = document.getElementById('super-admin-locked-notice');
+      const superControls = document.getElementById('super-admin-controls');
+
+      if (role === 'super') {
+        superBtn.className = "px-3 py-1.5 rounded-xl text-xs font-bold bg-white text-slate-900 shadow-sm transition";
+        staffBtn.className = "px-3 py-1.5 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 transition";
+        badge.className = "px-2.5 py-0.5 rounded-full text-xs font-bold bg-purple-100 text-purple-800";
+        badge.textContent = "SUPER ADMIN";
+        lockedNotice.classList.add('hidden');
+        superControls.classList.remove('opacity-40', 'pointer-events-none');
+      } else {
+        staffBtn.className = "px-3 py-1.5 rounded-xl text-xs font-bold bg-white text-slate-900 shadow-sm transition";
+        superBtn.className = "px-3 py-1.5 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 transition";
+        badge.className = "px-2.5 py-0.5 rounded-full text-xs font-bold bg-sky-100 text-sky-800";
+        badge.textContent = "STAFF ADMIN";
+        lockedNotice.classList.remove('hidden');
+        superControls.classList.add('opacity-40', 'pointer-events-none');
+      }
+    }
+
+    function switchAdminTab(tabName) {
+      ['products', 'orders', 'bookings', 'settings', 'admins'].forEach(t => {
+        const panel = document.getElementById(`admin-panel-${t}`);
+        const btn = document.getElementById(`admin-tab-${t}`);
+        if (t === tabName) {
+          panel.classList.remove('hidden');
+          btn.className = "admin-subtab px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold bg-brand-teal text-white shadow-sm shrink-0 flex items-center gap-1.5";
+        } else {
+          panel.classList.add('hidden');
+          btn.className = "admin-subtab px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 shrink-0 flex items-center gap-1.5";
+        }
+      });
+      lucide.createIcons();
+    }
+
+    function renderAdminDashboard() {
+      // Update KPIs
+      document.getElementById('kpi-products').textContent = appState.products.length;
+      document.getElementById('kpi-orders').textContent = appState.orders.length;
+      document.getElementById('kpi-bookings').textContent = appState.bookings.length;
+      document.getElementById('kpi-ad-status').textContent = appState.adBanner.enabled ? "ACTIVE" : "PAUSED";
+
+      // 1. Render Products Table
+      const tbody = document.getElementById('admin-products-tbody');
+      tbody.innerHTML = appState.products.map(p => `
+        <tr class="hover:bg-slate-50/80 transition">
+          <td class="py-3.5 px-4">
+            <div class="flex items-center gap-3">
+              <span class="text-2xl">${p.emoji || '🐾'}</span>
+              <div>
+                <div class="font-bold text-slate-900">${p.name}</div>
+                <div class="text-[11px] text-brand-teal font-semibold">${p.category}</div>
+              </div>
+            </div>
+          </td>
+          <td class="py-3.5 px-4">
+            <div class="font-extrabold text-slate-900">₹${p.ourPrice}</div>
+            <div class="text-[11px] text-slate-400 line-through">MRP ₹${p.marketPrice}</div>
+          </td>
+          <td class="py-3.5 px-4">
+            ${p.offerTag
+              ? `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-brand-amberSoft text-brand-amber border border-brand-amber/20">${p.offerTag}</span>`
+              : `<span class="text-[11px] text-slate-400 italic">No offer (Blank)</span>`
+            }
+          </td>
+          <td class="py-3.5 px-4">
+            <div class="font-bold ${p.stock > 0 ? 'text-emerald-700' : 'text-rose-600'}">
+              ${p.stock > 0 ? `${p.stock} in stock` : 'Out of Stock'}
+            </div>
+            <button onclick="toggleProductStock('${p.id}')" class="text-[11px] underline text-slate-500 hover:text-brand-teal">
+              ${p.stock > 0 ? 'Mark Out of Stock' : 'Restock (+15)'}
+            </button>
+          </td>
+          <td class="py-3.5 px-4 text-xs text-slate-600 max-w-xs">
+            <div class="font-semibold text-slate-800">Base Delivery: ${p.deliveryDays} day(s)</div>
+            <div class="text-[11px] text-slate-500 truncate">Return: ${p.returnPolicy}</div>
+          </td>
+          <td class="py-3.5 px-4 text-right">
+            <button onclick="openProductEditorModal('${p.id}')"
+              class="px-3 py-1.5 rounded-xl bg-brand-tealLight hover:bg-brand-teal hover:text-white text-brand-teal font-bold text-xs transition">
+              Edit Item
+            </button>
+          </td>
+        </tr>
+      `).join('');
+
+      // 2. Render Orders List
+      const ordersList = document.getElementById('admin-orders-list');
+      ordersList.innerHTML = appState.orders.map(o => `
+        <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/60 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div class="space-y-1">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="font-extrabold text-slate-900 text-sm">${o.id}</span>
+              <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800">${o.paymentMethod} • ₹${o.total}</span>
+              ${o.placedWhileClosed
+                ? `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-900">Ordered While Closed → Next Working Day</span>`
+                : `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-sky-100 text-sky-800">Standard Open-Hours Order</span>`
+              }
+            </div>
+            <div class="text-xs font-semibold text-slate-800">${o.customerName} (${o.phone})</div>
+            <div class="text-xs text-slate-500">${o.address}</div>
+            <div class="text-xs text-slate-700 pt-1"><strong>Items:</strong> ${o.itemsSummary}</div>
+            <div class="text-xs text-brand-teal font-semibold">Promised Timeline: ${o.estimatedDelivery}</div>
+          </div>
+
+          <div class="flex items-center gap-2 shrink-0">
+            <label class="text-xs font-bold text-slate-600">Delivery Status:</label>
+            <select onchange="updateOrderStatus('${o.id}', this.value)"
+              class="px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs font-bold text-slate-900">
+              <option ${o.status === 'Order Placed (Paid)' ? 'selected' : ''}>Order Placed (Paid)</option>
+              <option ${o.status === 'Packed & Ready' ? 'selected' : ''}>Packed & Ready</option>
+              <option ${o.status === 'Out for Delivery' ? 'selected' : ''}>Out for Delivery</option>
+              <option ${o.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+            </select>
+          </div>
+        </div>
+      `).join('');
+
+      // 3. Render Bookings List
+      const bookingsList = document.getElementById('admin-bookings-list');
+      bookingsList.innerHTML = appState.bookings.map(b => `
+        <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/70 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="font-extrabold text-slate-900 text-sm">${b.id} • ${b.pet}</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${b.status === 'Confirmed' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+              ${b.status}
+            </span>
+          </div>
+          <div class="text-xs font-semibold text-brand-teal">${b.service}</div>
+          <div class="text-xs text-slate-600">Owner: ${b.owner} (${b.phone})</div>
+          <div class="flex items-center justify-between pt-2 border-t border-slate-200 text-xs">
+            <span class="font-bold text-slate-800">📅 ${b.date} • ${b.slot}</span>
+            ${b.status !== 'Confirmed'
+              ? `<button onclick="confirmBooking('${b.id}')" class="px-3 py-1 rounded-lg bg-brand-teal text-white font-bold">Confirm Slot</button>`
+              : `<span class="text-emerald-700 font-bold">✓ Scheduled</span>`
+            }
+          </div>
+        </div>
+      `).join('');
+
+      // 4. Render Admins List
+      const adminsList = document.getElementById('admin-users-list');
+      adminsList.innerHTML = appState.admins.map(a => `
+        <div class="p-4 rounded-2xl border border-slate-200 flex items-center justify-between gap-3">
+          <div>
+            <div class="font-bold text-slate-900 text-sm">${a.name}</div>
+            <div class="text-xs text-slate-500">${a.email}</div>
+            <span class="inline-block mt-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${a.role.includes('Super') ? 'bg-purple-100 text-purple-800' : 'bg-slate-100 text-slate-700'}">
+              ${a.role}
+            </span>
+          </div>
+          ${a.id !== 'adm-1'
+            ? `<button onclick="removeAdminUser('${a.id}')" class="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold">Revoke</button>`
+            : `<span class="text-xs text-slate-400 font-semibold">Primary Owner</span>`
+          }
+        </div>
+      `).join('');
+
+      lucide.createIcons();
+    }
+
+    function toggleProductStock(prodId) {
+      const p = appState.products.find(item => item.id === prodId);
+      if (!p) return;
+      p.stock = p.stock > 0 ? 0 : 15;
+      renderProducts();
+      renderAdminDashboard();
+      showToast(`Updated stock for "${p.name}".`, "success");
+    }
+
+    function updateOrderStatus(orderId, newStatus) {
+      const order = appState.orders.find(o => o.id === orderId);
+      if (order) {
+        order.status = newStatus;
+        showToast(`Order ${orderId} updated to "${newStatus}".`, "success");
+      }
+    }
+
+    function confirmBooking(bookingId) {
+      const b = appState.bookings.find(item => item.id === bookingId);
+      if (b) {
+        b.status = "Confirmed";
+        renderAdminDashboard();
+        showToast(`Appointment ${bookingId} confirmed!`, "success");
+      }
+    }
+
+    // Add / Edit Product Modal Logic
+    function openProductEditorModal(productId = null) {
+      const catSelect = document.getElementById('edit-prod-category');
+      catSelect.innerHTML = appState.categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+
+      if (productId) {
+        const p = appState.products.find(item => item.id === productId);
+        document.getElementById('editor-modal-title').textContent = `Edit Product: ${p.name}`;
+        document.getElementById('edit-prod-id').value = p.id;
+        document.getElementById('edit-prod-name').value = p.name;
+        document.getElementById('edit-prod-category').value = p.category;
+        document.getElementById('edit-prod-market').value = p.marketPrice;
+        document.getElementById('edit-prod-price').value = p.ourPrice;
+        document.getElementById('edit-prod-offer').value = p.offerTag || "";
+        document.getElementById('edit-prod-stock').value = p.stock;
+        document.getElementById('edit-prod-days').value = p.deliveryDays;
+        document.getElementById('edit-prod-emoji').value = p.emoji || "🐾";
+        document.getElementById('edit-prod-desc').value = p.description;
+        document.getElementById('edit-prod-usage').value = p.usage;
+        document.getElementById('edit-prod-return').value = p.returnPolicy;
+        document.getElementById('edit-prod-refund').value = p.refundPolicy;
+      } else {
+        document.getElementById('editor-modal-title').textContent = "Add New Product to Store";
+        document.getElementById('edit-prod-id').value = "";
+        document.getElementById('edit-prod-name').value = "";
+        document.getElementById('edit-prod-market').value = "";
+        document.getElementById('edit-prod-price').value = "";
+        document.getElementById('edit-prod-offer').value = "";
+        document.getElementById('edit-prod-stock').value = 20;
+        document.getElementById('edit-prod-days').value = 2;
+        document.getElementById('edit-prod-emoji').value = "🐾";
+        document.getElementById('edit-prod-desc').value = "";
+        document.getElementById('edit-prod-usage').value = "";
+        document.getElementById('edit-prod-return').value = "7-day return if seal is intact";
+        document.getElementById('edit-prod-refund').value = "Full refund within 3 business days";
+      }
+
+      openModal('product-editor-modal');
+    }
+
+    function handleSaveProduct(e) {
+      e.preventDefault();
+      const id = document.getElementById('edit-prod-id').value;
+      const productData = {
+        id: id || `p-${Date.now()}`,
+        name: document.getElementById('edit-prod-name').value.trim(),
+        category: document.getElementById('edit-prod-category').value,
+        marketPrice: Number(document.getElementById('edit-prod-market').value),
+        ourPrice: Number(document.getElementById('edit-prod-price').value),
+        offerTag: document.getElementById('edit-prod-offer').value.trim(),
+        stock: Number(document.getElementById('edit-prod-stock').value),
+        deliveryDays: Number(document.getElementById('edit-prod-days').value),
+        emoji: document.getElementById('edit-prod-emoji').value.trim() || "🐾",
+        description: document.getElementById('edit-prod-desc').value.trim(),
+        usage: document.getElementById('edit-prod-usage').value.trim(),
+        returnPolicy: document.getElementById('edit-prod-return').value.trim(),
+        refundPolicy: document.getElementById('edit-prod-refund').value.trim()
+      };
+
+      if (id) {
+        const idx = appState.products.findIndex(p => p.id === id);
+        if (idx !== -1) appState.products[idx] = productData;
+        showToast(`Updated "${productData.name}" across the storefront!`, "success");
+      } else {
+        appState.products.unshift(productData);
+        showToast(`Added "${productData.name}" to the storefront!`, "success");
+      }
+
+      renderProducts();
+      renderAdminDashboard();
+      closeModal('product-editor-modal');
+    }
+
+    function openCategoryModal() {
+      const catName = `Pet Toys & Treats`;
+      if (!appState.categories.some(c => c.name === catName)) {
+        appState.categories.push({ id: `cat-${Date.now()}`, name: catName, description: "Interactive chew toys & healthy training treats" });
+        renderCategoryPills();
+        showToast(`New category "${catName}" added! You can now assign products to it.`, "success");
+      } else {
+        showToast(`Category "${catName}" is already active in your catalog.`, "info");
+      }
+    }
+
+    // Ad Banner & Policies Live Sync
+    function updateAdBannerSettings() {
+      const enabled = document.getElementById('setting-ad-enabled').checked;
+      const title = document.getElementById('setting-ad-title').value;
+      const subtitle = document.getElementById('setting-ad-subtitle').value;
+
+      appState.adBanner = { enabled, title, subtitle };
+      const bannerEl = document.getElementById('store-ad-banner');
+      if (enabled) {
+        bannerEl.classList.remove('hidden');
+        document.getElementById('ad-banner-title').textContent = title;
+        document.getElementById('ad-banner-subtitle').textContent = subtitle;
+      } else {
+        bannerEl.classList.add('hidden');
+      }
+      renderAdminDashboard();
+    }
+
+    function saveStorePolicies() {
+      appState.storePolicies.return = document.getElementById('policy-edit-return').value;
+      appState.storePolicies.refund = document.getElementById('policy-edit-refund').value;
+      appState.storePolicies.security = document.getElementById('policy-edit-security').value;
+      showToast("Store-wide Return, Refund & Security policies updated live!", "success");
+    }
+
+    function openPolicyModal(type) {
+      const titles = {
+        return: "Store Return Policy",
+        refund: "Store Refund Policy",
+        security: "Data Security & Privacy Policy"
+      };
+      document.getElementById('policy-modal-title').textContent = titles[type];
+      document.getElementById('policy-modal-body').textContent = appState.storePolicies[type];
+      openModal('policy-viewer-modal');
+    }
+
+    // Super Admin User Creation
+    function handleAddAdminUser(e) {
+      e.preventDefault();
+      if (appState.adminRole !== 'super') return;
+      const name = document.getElementById('new-admin-name').value.trim();
+      const email = document.getElementById('new-admin-email').value.trim();
+      const role = document.getElementById('new-admin-role').value;
+
+      appState.admins.push({ id: `adm-${Date.now()}`, name, email, role, active: true });
+      document.getElementById('new-admin-name').value = "";
+      document.getElementById('new-admin-email').value = "";
+      renderAdminDashboard();
+      showToast(`Created ${role} account for ${name}.`, "success");
+    }
+
+    function removeAdminUser(id) {
+      appState.admins = appState.admins.filter(a => a.id !== id);
+      renderAdminDashboard();
+      showToast("Staff admin access revoked.", "warning");
+    }
+
+    // -----------------------------------------------------------------------
+    // 9. MODAL & TOAST UTILITIES
+    // -----------------------------------------------------------------------
+    function openModal(id) {
+      document.getElementById(id).classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
+
+    function showToast(message, type = "success") {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      const colors = {
+        success: "bg-slate-900 text-white border-emerald-500",
+        warning: "bg-amber-950 text-amber-50 border-brand-amber",
+        info: "bg-brand-tealDark text-white border-sky-400"
+      };
+      toast.className = `pointer-events-auto p-3.5 rounded-2xl shadow-xl border-l-4 text-xs font-medium flex items-center justify-between gap-3 transition-all ${colors[type] || colors.success}`;
+      toast.innerHTML = `
+        <span>${message}</span>
+        <button onclick="this.parentElement.remove()" class="text-white/70 hover:text-white font-bold">✕</button>
+      `;
+      container.appendChild(toast);
+      setTimeout(() => {
+        if (toast.parentElement) toast.remove();
+      }, 4500);
+    }
+
+    // -----------------------------------------------------------------------
+    // 10. INITIALIZE APPLICATION ON LOAD
+    // -----------------------------------------------------------------------
+    window.addEventListener('DOMContentLoaded', () => {
+      selectFlowDiagram('customer');
+      syncShopStatusUI();
+      renderCategoryPills();
+      renderProducts();
+      updateCartBadge();
+      renderAdminDashboard();
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
